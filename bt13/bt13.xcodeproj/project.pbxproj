@@ -78,7 +78,6 @@
 				55EB19751E1C928F00E25CE4 /* bt13.xcdatamodeld */,
 				55EB19841E1C92FB00E25CE4 /* ViewController */,
 				55EB19851E1C930300E25CE4 /* VideoViewController */,
-				55EB19861E1C930700E25CE4 /* New Group2 */,
 				55EB19831E1C92B500E25CE4 /* support */,
 			);
 			path = bt13;
@@ -114,13 +113,6 @@
 				55EB19991E1CA4FD00E25CE4 /* VideoTableViewCell */,
 			);
 			name = VideoViewController;
-			sourceTree = "<group>";
-		};
-		55EB19861E1C930700E25CE4 /* New Group2 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "New Group2";
 			sourceTree = "<group>";
 		};
 		55EB198B1E1C948400E25CE4 /* CategoriesTableViewCell */ = {
@@ -385,6 +377,7 @@
 				55EB19821E1C928F00E25CE4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

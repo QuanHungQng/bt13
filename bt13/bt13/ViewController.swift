@@ -13,7 +13,7 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var tableView: LoadingScreen!
     var download = DownloadImage(maxConcurrent: 10)
-    var dicIdCategorie: [String: Int16] = [:]
+    var dicIdCategorie: [String: [Video]] = [:]
     
     //MARK: fetched Results Controller Categorie
     lazy var fetchedResultsController: NSFetchedResultsController<Categorie> = {
@@ -58,28 +58,54 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
         
         navigationController?.navigationBar.topItem?.title = "Categories"
         
-        let Categorie = fetchedResultsController.fetchedObjects
-        if Categorie?.count == 0 {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let getContext = appDelegate.mainCT
+        let fetchRequestC = NSFetchRequest<NSFetchRequestResult>(entityName: "Categorie")
+        let fetchRequestV = NSFetchRequest<NSFetchRequestResult>(entityName: "Video")
+        
+        let array1 = try! getContext.fetch(fetchRequestV) as! [Video]
+        let array2 = try! getContext.fetch(fetchRequestC) as! [Categorie]
+        
+        let categorie = fetchedResultsController.fetchedObjects
+        if categorie?.count == 0 {
             getData(modifiedS: "0")
             getDataVideo(modifiedS: "0")
         }else {
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let getContext = appDelegate.persistentContainer.viewContext
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Categorie")
-            let sortD = NSSortDescriptor(key: "modified", ascending: true)
-            fetchRequest.sortDescriptors = [sortD]
             
-            do {
-                let array2 = try getContext.fetch(fetchRequest) as! [Categorie]
-                let modifiedMax = array2.last?.modified
-                let es = modifiedMax?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
-                getData(modifiedS: es!)
-                getDataVideo(modifiedS: es!)
-            }catch{}
+            let sortD = NSSortDescriptor(key: "modified", ascending: true)
+            fetchRequestC.sortDescriptors = [sortD]
+            let modifiedMax = array2.last?.modified
+            let es = modifiedMax?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+            getData(modifiedS: es!)
+            getDataVideo(modifiedS: es!)
+            
+        }
+        var first = [Int16]()
+        for s in array1 {
+            first.append(s.category_id)
+        }
+        
+        for i in 0..<first.count {
+            var value = [Video]()
+            for j in (i+1)..<first.count {
+                if first[i] == first[j] {
+                    value.append(array1[i])
+                    value.append(array1[j])
+                    dicIdCategorie["\(first[i])"] = value
+                }
+            }
+            let key = first[i]
+            value.append(array1[i])
+            dicIdCategorie["\(key)"] = value
         }
         
         
+        if fetchedResultsController.value(forKey: "id") as? Int16 == fetchedVideoResultsController.value(forKey: "category_id") as? Int16 {
+//            dicIdCategorie["id"] = 
+        }
+        
         tableView.dataSource = self
+        tableView.delegate = self
         tableView.separatorStyle = .singleLine
     }
     
@@ -257,13 +283,25 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
                 tableView.insertRows(at: [indexpath], with: .automatic)
             }
             break
-        case NSFetchedResultsChangeType.update:
-            if let indexPath = indexPath {
-                
-                configure(tableView.cellForRow(at: indexPath) as! CategoriesTableViewCell, at: indexPath)
+        case .update:
+            if let indexPath = indexPath, let cell = tableView.cellForRow(at: indexPath) {
+                configure(cell as! CategoriesTableViewCell, at: indexPath)
             }
-        default:
-            print("No Controller")
+            break
+        case .delete:
+            if let indexPath = indexPath {
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+            break
+        case .move:
+            if let indexPath = indexPath {
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+            
+            if let indexPath = indexPath {
+                tableView.insertRows(at: [indexPath], with: .automatic)
+            }
+            break
         }
     }
     
@@ -281,7 +319,9 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
         let categorie = fetchedResultsController.object(at: indexPath)
         cell.nameCategorie.text = categorie.name
         
-        cell.videoCountCategorie.text = "\(dicIdCategorie["\(categorie.id)"])"
+        let arr = dicIdCategorie["\(fetchedResultsController.object(at: indexPath).id)"]
+        
+        cell.videoCountCategorie.text = "\(arr?.count)"
         download.downloadJsonWithTask(url: categorie.thumbnail!, indexPath: indexPath, callBack: { (returnIndexpath, image) -> Void in
             if indexPath == returnIndexpath {
                 cell.imageCategorie.image = image
@@ -306,5 +346,8 @@ extension ViewController: UITableViewDataSource {
 
 //MARK: Table View Delegate
 extension ViewController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let detailVideo = VideoViewController(nibName: "VideoViewController", bundle: nil)
+        self.navigationController?.pushViewController(detailVideo, animated: true)
+    }
 }

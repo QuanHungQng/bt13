@@ -54,13 +54,25 @@ class VideoViewController: UIViewController, NSFetchedResultsControllerDelegate 
                 tableView.insertRows(at: [indexpath], with: .automatic)
             }
             break
-        case NSFetchedResultsChangeType.update:
-            if let indexPath = indexPath {
-                
-                configure(tableView.cellForRow(at: indexPath) as! VideoTableViewCell, at: indexPath)
+        case .update:
+            if let indexPath = indexPath, let cell = tableView.cellForRow(at: indexPath) {
+                configure(cell as! VideoTableViewCell, at: indexPath)
             }
-        default:
-            print("No Controller")
+            break
+        case .delete:
+            if let indexPath = indexPath {
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+            break
+        case .move:
+            if let indexPath = indexPath {
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+            
+            if let indexPath = indexPath {
+                tableView.insertRows(at: [indexPath], with: .automatic)
+            }
+            break
         }
     }
     
@@ -97,5 +109,14 @@ extension VideoViewController: UITableViewDataSource {
         let cell = Bundle.main.loadNibNamed("VideoTableViewCell", owner: self, options: nil)?.first as! VideoTableViewCell
         configure(cell, at: indexPath)
         return cell
+    }
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            var fetch = fetchedResultsController.fetchedObjects! as [Video]
+            fetch.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        } else if editingStyle == .insert {
+            ///
+        }
     }
 }
