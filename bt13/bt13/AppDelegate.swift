@@ -50,8 +50,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let mainCT = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         mainCT.parent = self.writerCT
-        self.mainCT.persistentStoreCoordinator = self.persistentContainer.persistentStoreCoordinator
-        
         return mainCT
     }()
     
@@ -59,8 +57,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var backgroundCT: NSManagedObjectContext {
         let backgroundCT = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         backgroundCT.parent = self.mainCT
-        self.backgroundCT.persistentStoreCoordinator = self.persistentContainer.persistentStoreCoordinator
-        
         return backgroundCT
     }
     
