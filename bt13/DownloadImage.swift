@@ -8,7 +8,7 @@ class DownloadImage : NSObject {
     init(maxConcurrent : Int) {
         self.queue.maxConcurrentOperationCount = maxConcurrent
     }
-    func downloadJsonWithTask(url : String, indexPath : IndexPath, callBack : @escaping ((IndexPath, UIImage?) -> Void)) {
+    func downloadImage(url : String, indexPath : IndexPath, callBack : @escaping ((IndexPath, UIImage?) -> Void)) {
         if let image = getImage(url: url) {
             callBack(indexPath, image)
         } else {

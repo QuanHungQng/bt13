@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2657" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_0" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="VideoViewController" customModule="bt13" customModuleProvider="target">
+            <connections>
+                <outlet property="tableView" destination="A3V-mK-3sh" id="lGu-g0-awj"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="100" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="A3V-mK-3sh">
+                    <rect key="frame" x="0.0" y="30" width="320" height="538"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                </tableView>
+                <button opaque="NO" alpha="0.40000000000000002" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZUJ-PZ-DNl">
+                    <rect key="frame" x="100" y="65" width="120" height="30"/>
+                    <color key="backgroundColor" red="0.97379026800000001" green="1" blue="0.85694664269999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <state key="normal" title="Number Of Views"/>
+                    <connections>
+                        <action selector="SortNumber:" destination="-1" eventType="touchUpInside" id="iIo-LL-qoS"/>
+                    </connections>
+                </button>
+                <button opaque="NO" alpha="0.40000000000000002" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ELV-My-HqS">
+                    <rect key="frame" x="5" y="65" width="75" height="30"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    <state key="normal" title="Sort Name">
+                        <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="SortName:" destination="-1" eventType="touchUpInside" id="ZAw-Cg-Ajn"/>
+                    </connections>
+                </button>
+                <button opaque="NO" alpha="0.40000000000000002" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Xf-aZ-tub">
+                    <rect key="frame" x="240" y="65" width="75" height="30"/>
+                    <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <state key="normal" title="Created"/>
+                    <connections>
+                        <action selector="SortCreated:" destination="-1" eventType="touchUpInside" id="zX3-20-0by"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="A3V-mK-3sh" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="A4B-X4-DT3"/>
+                <constraint firstItem="ZUJ-PZ-DNl" firstAttribute="leading" secondItem="ELV-My-HqS" secondAttribute="trailing" constant="20" id="Ajt-BD-r7W"/>
+                <constraint firstAttribute="trailing" secondItem="9Xf-aZ-tub" secondAttribute="trailing" priority="750" constant="5" id="IQ6-tu-Izs"/>
+                <constraint firstItem="ZUJ-PZ-DNl" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="XJZ-ln-gVt"/>
+                <constraint firstAttribute="trailing" secondItem="A3V-mK-3sh" secondAttribute="trailing" id="XzL-pO-220"/>
+                <constraint firstItem="9Xf-aZ-tub" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="65" id="ZJp-Ie-ZEe"/>
+                <constraint firstItem="ELV-My-HqS" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="5" id="drc-8P-mxI"/>
+                <constraint firstAttribute="bottom" secondItem="A3V-mK-3sh" secondAttribute="bottom" id="hsh-nO-QTs"/>
+                <constraint firstItem="ELV-My-HqS" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="65" id="jNo-Tl-Biz"/>
+                <constraint firstItem="A3V-mK-3sh" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="30" id="k1g-ss-jD0"/>
+                <constraint firstItem="9Xf-aZ-tub" firstAttribute="leading" secondItem="ZUJ-PZ-DNl" secondAttribute="trailing" constant="20" id="vk6-ac-bdr"/>
+                <constraint firstItem="ZUJ-PZ-DNl" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="65" id="xwH-a6-MJ5"/>
+            </constraints>
+        </view>
+    </objects>
+</document>

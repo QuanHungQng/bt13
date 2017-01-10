@@ -13,8 +13,8 @@ class VideoTableViewCell: UITableViewCell {
     @IBOutlet weak var imageCell: UIImageView!
     @IBOutlet weak var nameCell: UILabel!
     @IBOutlet weak var personViewCell: UILabel!
-    
-    
+
+
     override func awakeFromNib() {
         super.awakeFromNib()
         

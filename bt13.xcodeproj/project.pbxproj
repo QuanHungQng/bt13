@@ -35,7 +35,7 @@
 		55EB198C1E1C94AA00E25CE4 /* CategoriesTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoriesTableViewCell.swift; sourceTree = "<group>"; };
 		55EB198D1E1C94AA00E25CE4 /* CategoriesTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CategoriesTableViewCell.xib; sourceTree = "<group>"; };
 		55EB19901E1C9ABD00E25CE4 /* DownloadImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadImage.swift; sourceTree = "<group>"; };
-		55EB19921E1C9AE500E25CE4 /* bt13-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "bt13-Bridging-Header.h"; sourceTree = "<group>"; };
+		55EB19921E1C9AE500E25CE4 /* bt13-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "bt13-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
 		55EB19951E1CA4D700E25CE4 /* VideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoViewController.swift; sourceTree = "<group>"; };
 		55EB19961E1CA4D700E25CE4 /* VideoViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VideoViewController.xib; sourceTree = "<group>"; };
 		55EB199A1E1CA52000E25CE4 /* VideoTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoTableViewCell.swift; sourceTree = "<group>"; };
@@ -59,7 +59,6 @@
 			children = (
 				55EB196D1E1C928F00E25CE4 /* bt13 */,
 				55EB196C1E1C928F00E25CE4 /* Products */,
-				55EB19921E1C9AE500E25CE4 /* bt13-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -86,6 +85,7 @@
 		55EB19831E1C92B500E25CE4 /* support */ = {
 			isa = PBXGroup;
 			children = (
+				55EB19921E1C9AE500E25CE4 /* bt13-Bridging-Header.h */,
 				55EB197A1E1C928F00E25CE4 /* LaunchScreen.storyboard */,
 				55EB19781E1C928F00E25CE4 /* Assets.xcassets */,
 				55EB197D1E1C928F00E25CE4 /* Info.plist */,

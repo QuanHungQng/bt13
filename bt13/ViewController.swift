@@ -1,11 +1,3 @@
-//
-//  ViewController.swift
-//  bt13
-//
-//  Created by Unima-TD-04 on 1/4/17.
-//  Copyright © 2017 Unima-TD-04. All rights reserved.
-//
-
 import UIKit
 import CoreData
 
@@ -13,14 +5,16 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var tableView: LoadingScreen!
     var download = DownloadImage(maxConcurrent: 10)
-    var dicIdCategorie: [String: [Video]] = [:]
+    weak var categoryID: Video!
     
-    //MARK: fetched Results Controller Categorie
-    lazy var fetchedResultsController: NSFetchedResultsController<Categorie> = {
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    
+    //MARK: fetched Results Controller Category
+    lazy var fetchedResultsController: NSFetchedResultsController<Category> = {
         
-        let mainCT = (UIApplication.shared.delegate as! AppDelegate).mainCT
+        let mainCT = self.appDelegate.mainCT
         // Create Fetch Request
-        let fetchRequest: NSFetchRequest<Categorie> = Categorie.fetchRequest()
+        let fetchRequest: NSFetchRequest<Category> = Category.fetchRequest()
         // Configure Fetch Request
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
         // Create Fetched Results Controller
@@ -31,86 +25,72 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
         } catch {
             print("Error fetched results controller")
         }
+        
         return fetchedResultsController
     }()
     
-    //MARK: fetched Results Controller Video
-    lazy var fetchedVideoResultsController: NSFetchedResultsController<Video> = {
-        
-        let mainCT = (UIApplication.shared.delegate as! AppDelegate).mainCT
-        // Create Fetch Request
-        let fetchRequest: NSFetchRequest<Video> = Video.fetchRequest()
-        // Configure Fetch Request
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
-        // Create Fetched Results Controller
-        let fetchedVideoResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainCT , sectionNameKeyPath: nil, cacheName: nil)
-        fetchedVideoResultsController.delegate = self
-        do {
-            try fetchedVideoResultsController.performFetch()
-        } catch {
-            print("Error fetched results controller")
-        }
-        return fetchedVideoResultsController
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.topItem?.title = "Categories"
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let getContext = appDelegate.mainCT
-        let fetchRequestC = NSFetchRequest<NSFetchRequestResult>(entityName: "Categorie")
-        let fetchRequestV = NSFetchRequest<NSFetchRequestResult>(entityName: "Video")
-        
-        let array1 = try! getContext.fetch(fetchRequestV) as! [Video]
-        let array2 = try! getContext.fetch(fetchRequestC) as! [Categorie]
-        
-        let categorie = fetchedResultsController.fetchedObjects
-        if categorie?.count == 0 {
-            getData(modifiedS: "0")
-            getDataVideo(modifiedS: "0")
-        }else {
-            
-            let sortD = NSSortDescriptor(key: "modified", ascending: true)
-            fetchRequestC.sortDescriptors = [sortD]
-            let modifiedMax = array2.last?.modified
-            let es = modifiedMax?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
-            getData(modifiedS: es!)
-            getDataVideo(modifiedS: es!)
-            
-        }
-        var first = [Int16]()
-        for s in array1 {
-            first.append(s.category_id)
-        }
-        
-        for i in 0..<first.count {
-            var value = [Video]()
-            for j in (i+1)..<first.count {
-                if first[i] == first[j] {
-                    value.append(array1[i])
-                    value.append(array1[j])
-                    dicIdCategorie["\(first[i])"] = value
-                }
-            }
-            let key = first[i]
-            value.append(array1[i])
-            dicIdCategorie["\(key)"] = value
-        }
-        
-        
-        if fetchedResultsController.value(forKey: "id") as? Int16 == fetchedVideoResultsController.value(forKey: "category_id") as? Int16 {
-//            dicIdCategorie["id"] = 
-        }
+        navigationController?.navigationBar.topItem?.title = "Category"
         
         tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorStyle = .singleLine
+        
+        
+        
+        getDataCategory(modifiedS: getModifiedCategorie(), callback: { (checkCategorie) -> Void in
+            if checkCategorie == true {
+                
+                self.getDataVideo(modifiedS: self.getModifiedVideo(),callback: {(checkVideo) -> Void in
+                    if checkVideo == true {
+                        self.tableView.removeLoadingScreen()
+                    }
+                })
+            }
+        })
+        
     }
     
+//    getModifiedCategorie(chooseClass: Category(), entityName: "Category")
+    
+    func getModifiedCategorie() -> String {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Category")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "modified", ascending: true)]
+        let array1 = try? self.appDelegate.mainCT.fetch(fetchRequest) as! [Category]
+        
+        if (array1?.count)! > 0 {
+            let modifiedMax = array1?.last?.modified
+            let es = modifiedMax?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+            return es!
+        } else {
+            return "0"
+        }
+    }
+    
+    func getModifiedVideo() -> String {
+        
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Video")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "modified", ascending: true)]
+        let array2 = try? self.appDelegate.mainCT.fetch(fetchRequest) as! [Video]
+        
+        
+        
+        if (array2?.count)! > 0 {
+            let modifiedMax = array2?.last?.modified
+            let es = modifiedMax?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+            return es!
+        } else {
+            return "0"
+        }
+    }
+    
+    
+    
     //MARK: get Data categories
-    func getData(modifiedS: String) {
+    func getDataCategory(modifiedS: String, callback: @escaping (Bool) -> Void) {
         
         let urlString = "http://nikmesoft.com/apis/englishvideos-api/public/index_debug.php/v1/categories?last_updated=\(modifiedS)"
         guard let url = NSURL(string: urlString) else {
@@ -125,6 +105,11 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
         
         session.dataTask(with: urlRequest, completionHandler: {(data, response, error) -> Void in
             if error != nil {
+                
+                self.tableView.removeLoadingScreen()
+                
+                let alertCategory = self.alert(view: self.view, message: "Check the connection Category")
+                self.present(alertCategory, animated: true, completion: nil)
                 return
             }
             do {
@@ -139,55 +124,58 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
                     let name = json["name"] as! String
                     let thumbnail = json["thumbnail"] as! String
                     let id = json["id"] as! Int16
-                    let deleted = json["deleted"] as! Int16
                     let created = json["created"] as! String
                     let modified = json["modified"] as! String
                     
-                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                    let mainCT = appDelegate.mainCT
-                    let backgroundCT = appDelegate.backgroundCT
-                    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Categorie")
                     
-                    backgroundCT.perform({
+                    let mainCT = self.appDelegate.mainCT
+                    let backgroundCT = self.appDelegate.backgroundCT
+                    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Category")
+                    
+                    backgroundCT.performAndWait({
                         let predicate = NSPredicate(format: "id == %@", "\(id)")
                         fetchRequest.predicate = predicate
-                        let fetched = try! backgroundCT.fetch(fetchRequest) as! [Categorie]
+                        let fetched = try! backgroundCT.fetch(fetchRequest) as! [Category]
                         
                         if fetched.count == 0 {
+                            let categorie = Category(context: backgroundCT)
+                            categorie.id = id
+                            categorie.name = name
+                            categorie.thumbnail = thumbnail
                             
-                            let video = Categorie(context: backgroundCT)
-                            video.id = id
-                            video.name = name
-                            video.thumbnail = thumbnail
-                            video.delete = deleted
-                            video.created = created
-                            video.modified = modified
+                            categorie.created = created
+                            categorie.modified = modified
+                            
                             
                         } else {
                             fetched.first?.name = name
                             fetched.first?.thumbnail = thumbnail
-                            fetched.first?.delete = deleted
                             fetched.first?.created = created
                             fetched.first?.modified = modified
                         }
                         try! backgroundCT.save()
-                        mainCT.perform({
+                        mainCT.performAndWait({
                             try! mainCT.save()
-                            appDelegate.writerCT.perform({
-                                try! appDelegate.writerCT.save()
+                            self.appDelegate.writerCT.perform({
+                                try! self.appDelegate.writerCT.save()
+                                
                             })
                         })
                     })
+                    
+                }
+                // call back
+                callback(true)
+                OperationQueue.main.addOperation {
+                    self.tableView.removeLoadingScreen()
                 }
             }
-            OperationQueue.main.addOperation {
-                self.tableView.removeLoadingScreen()
-            }
         }).resume()
+        
     }
     
     //MARK: get Data Video
-    func getDataVideo(modifiedS: String) {
+    func getDataVideo(modifiedS: String, callback: @escaping (Bool) -> Void) {
         
         let urlString = "http://nikmesoft.com/apis/englishvideos-api/public/index_debug.php/v1/videos?last_updated=\(modifiedS)"
         guard let url = NSURL(string: urlString) else {
@@ -202,6 +190,10 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
         
         session.dataTask(with: urlRequest, completionHandler: {(data, response, error) -> Void in
             if error != nil {
+                
+                let alertVideo = self.alert(view: self.view, message: "Check the connection Video")
+                self.present(alertVideo, animated: true, completion: nil)
+                
                 return
             }
             do {
@@ -219,16 +211,15 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
                     let link = json["link"] as! String
                     let duration = json["duration"] as! Int16
                     let number_of_views = json["number_of_views"] as! Int16
-                    let deleted = json["deleted"] as! Int16
                     let created = json["created"] as! String
                     let modified = json["modified"] as! String
                     
-                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                    let mainCT = appDelegate.mainCT
-                    let backgroundCT = appDelegate.backgroundCT
+                    
+                    let mainCT = self.appDelegate.mainCT
+                    let backgroundCT = self.appDelegate.backgroundCT
                     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Video")
                     
-                    backgroundCT.perform({
+                    backgroundCT.performAndWait({
                         let predicate = NSPredicate(format: "id == %@", "\(id)")
                         fetchRequest.predicate = predicate
                         let fetched = try! backgroundCT.fetch(fetchRequest) as! [Video]
@@ -243,9 +234,14 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
                             video.link = link
                             video.duration = Double(duration)
                             video.number_of_views = number_of_views
-                            video.delete = deleted
+                            video.delete = false
                             video.created = created
                             video.modified = modified
+                            
+                            let req:NSFetchRequest = Category.fetchRequest()
+                            req.predicate = NSPredicate(format: "id == %ld", category_id)
+                            let res = try! backgroundCT.fetch(req)
+                            video.category = res[0]
                             
                         } else {
                             
@@ -255,18 +251,27 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
                             fetched.first?.link = link
                             fetched.first?.duration = Double(duration)
                             fetched.first?.number_of_views = number_of_views
-                            fetched.first?.delete = deleted
+                            
                             fetched.first?.created = created
                             fetched.first?.modified = modified
                             
+                            
+                            let req:NSFetchRequest = Category.fetchRequest()
+                            req.predicate = NSPredicate(format: "id == %ld", category_id)
+                            let res = try! backgroundCT.fetch(req)
+                            fetched.first?.category = res[0]
                         }
-                        try! backgroundCT.save()
-                        mainCT.perform({
-                            try! mainCT.save()
-                            appDelegate.writerCT.perform({
-                                try! appDelegate.writerCT.save()
+                        do{
+                            try backgroundCT.save()
+                            mainCT.performAndWait({
+                                try! mainCT.save()
+                                self.appDelegate.writerCT.perform({
+                                    try! self.appDelegate.writerCT.save()
+                                    callback(true)
+                                })
                             })
-                        })
+                        } catch{}
+                        
                     })
                     
                 }
@@ -274,16 +279,24 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
         }).resume()
     }
     
+    func alert(view: UIView, message: String) -> UIAlertController {
+        let alertController = UIAlertController(title: "ERROR", message: message, preferredStyle: .alert)
+        let defaultAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alertController.addAction(defaultAction)
+        return alertController
+    }
     
     //MARK: Controller
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .insert:
+            
             if let indexpath = newIndexPath {
                 tableView.insertRows(at: [indexpath], with: .automatic)
             }
             break
         case .update:
+            
             if let indexPath = indexPath, let cell = tableView.cellForRow(at: indexPath) {
                 configure(cell as! CategoriesTableViewCell, at: indexPath)
             }
@@ -317,16 +330,16 @@ class ViewController: UIViewController, NSFetchedResultsControllerDelegate {
     func configure(_ cell: CategoriesTableViewCell, at indexPath: IndexPath) {
         
         let categorie = fetchedResultsController.object(at: indexPath)
-        cell.nameCategorie.text = categorie.name
         
-        let arr = dicIdCategorie["\(fetchedResultsController.object(at: indexPath).id)"]
+        cell.cell = categorie
         
-        cell.videoCountCategorie.text = "\(arr?.count)"
-        download.downloadJsonWithTask(url: categorie.thumbnail!, indexPath: indexPath, callBack: { (returnIndexpath, image) -> Void in
+        download.downloadImage(url: categorie.thumbnail!, indexPath: indexPath, callBack: { (returnIndexpath, image) -> Void in
             if indexPath == returnIndexpath {
                 cell.imageCategorie.image = image
             }
+            
         })
+        
     }
 }
 
@@ -349,5 +362,8 @@ extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let detailVideo = VideoViewController(nibName: "VideoViewController", bundle: nil)
         self.navigationController?.pushViewController(detailVideo, animated: true)
+        let categorie = fetchedResultsController.object(at: indexPath)
+        detailVideo.idCategory = categorie.id
+        detailVideo.nameCategory = categorie.name
     }
 }
